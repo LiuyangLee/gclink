@@ -9,20 +9,17 @@ orf_locate(in_seq_data = seq_data)
 \arguments{
 \item{in_seq_data}{A data frame with two columns:
 \describe{
-\item{\code{SeqName}}{ORF Sequence Name.} \code{SeqName} includes the information of \code{qaccver},
-\code{start}, \code{end}, and \code{direction}.
-\item{\code{Sequence}}{ORF Sequence.}. e.g., "Kuafubacteriaceae--GCA_016703535.1---JADJBV010000001.1_1
-# 74 # 1018 # 1 # ID=1_1;partial=00;start_type=ATG;rbs_motif=AGGAG;rbs_spacer=5-10bp;gc_cont=0.685"
-}.
-This data frame can be scaled from \strong{Prodigal} FASTA output by the command:
-seq_data = "Prodigal.fasta" \%>\%
-{Biostrings::readBStringSet(., format="fasta", nrec=-1L, skip=0L, seek.first.rec=FALSE, use.names=TRUE)} \%>\%
-{data.frame(Sequence = .)} \%>\%
-{tibble::rownames_to_column(., "SeqName")}
+\item{\code{SeqName}}{ORF identifier (Prodigal format: \verb{>ORF_id # start # end # strand # ...}).}
+\item{\code{Sequence}}{ORF sequence.}
+}
+Example:
+\code{"Kuafubacteriaceae--GCA_016703535.1---JADJBV010000001.1_1 # 74 # 1018 # 1 # ..."}
+Can be imported from \strong{Prodigal} FASTA using:
 
-\strong{Prodigal} FASTA output: Each row must correspond to a header line (starting with \code{>}).
-The header is expected to follow the standard Prodigal format:
-\code{>contig_id # start # end # strand # ...}.}
+\if{html}{\out{<div class="sourceCode r">}}\preformatted{seq_data <- Biostrings::readBStringSet("Prodigal.fasta",format="fasta", nrec=-1L, skip=0L, seek.first.rec=FALSE, use.names=TRUE) \%>\%
+  data.frame(Sequence = .) \%>\%
+  tibble::rownames_to_column("SeqName")
+}\if{html}{\out{</div>}}}
 }
 \value{
 A data frame

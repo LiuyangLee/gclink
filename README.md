@@ -3,7 +3,9 @@
 
 ## Overview
 
-`gclink` performs end-to-end analysis of gene clusters (e.g., photosynthesis, carbon/nitrogen/sulfur cycling, carotenoid, antibiotic, or viral genes) from (meta)genomes or (meta)transcriptomes. It provides:
+`gclink` performs end-to-end analysis of gene clusters (e.g., photosynthesis,<br>
+carbon/nitrogen/sulfur cycling, carotenoid, antibiotic, or viral genes)<br>
+from (meta)genomes or (meta)transcriptomes. It provides:
 
 - Parsing of Diamond/BLASTp-style results (including EggNOG output)
 - Contiguous cluster detection

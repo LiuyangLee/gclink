@@ -53,7 +53,7 @@ Example:
 \code{"Kuafubacteriaceae--GCA_016703535.1---JADJBV010000001.1_1 # 74 # 1018 # 1 # ..."}
 Can be imported from \strong{Prodigal} FASTA using:
 
-\if{html}{\out{<div class="sourceCode r">}}\preformatted{seq_data <- Biostrings::readBStringSet("Prodigal.fasta") \%>\%
+\if{html}{\out{<div class="sourceCode r">}}\preformatted{seq_data <- Biostrings::readBStringSet("Prodigal.fasta",format="fasta", nrec=-1L, skip=0L, seek.first.rec=FALSE, use.names=TRUE) \%>\%
   data.frame(Sequence = .) \%>\%
   tibble::rownames_to_column("SeqName")
 }\if{html}{\out{</div>}}

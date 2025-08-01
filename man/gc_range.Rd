@@ -39,7 +39,7 @@ centred on that gene can fit within \code{AllGeneNum} consecutive ORFs.
 \item Genes that pass the test are collected in \code{retain.site}.
 \item The \strong{minimal} and \strong{maximal} positions in \code{retain.site} are then
 used to slice the full ORF range, guaranteeing that the final cluster
-length ≤ \code{AllGeneNum}.
+length <= \code{AllGeneNum}.
 }
 }
 \examples{

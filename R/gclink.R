@@ -49,7 +49,7 @@ NULL  # 仅用于生成NAMESPACE的占位符
 #'   `"Kuafubacteriaceae--GCA_016703535.1---JADJBV010000001.1_1 # 74 # 1018 # 1 # ..."`
 #'   Can be imported from **Prodigal** FASTA using:
 #'   ```r
-#'   seq_data <- Biostrings::readBStringSet("Prodigal.fasta") %>%
+#'   seq_data <- Biostrings::readBStringSet("Prodigal.fasta",format="fasta", nrec=-1L, skip=0L, seek.first.rec=FALSE, use.names=TRUE) %>%
 #'     data.frame(Sequence = .) %>%
 #'     tibble::rownames_to_column("SeqName")
 #'   ```
