@@ -1,0 +1,123 @@
+###
+#' @Date: 2022-11-02 23:40:20
+#' @LastEditors: LiuyangLi
+#' @LastEditTime: 2024-07-12 14:03:49
+#' @FilePath: /liliuyang/software/gclink/M1S6.Module_Sample.group_by_pathway.cmd.R
+#' @Description: transfer the count to relative abundance
+
+setwd('C:/Users/Administrator/Desktop/Script/Rscript/custom_R/')
+
+#install.packages("devtools")
+#install.packages("knitr")
+
+library(devtools)
+library(knitr)
+
+#devtools::has_devel(debug = T)
+#pkgbuild::check_build_tools(debug = T)
+
+library(devtools)
+library(dplyr)
+#create_package("gclink")
+
+setwd('C:/Users/Administrator/Desktop/Script/Rscript/custom_R/gclink/')
+
+devtools::document()
+
+
+pkg_version <- as.character(packageVersion("dplyr"))
+usethis::use_package("dplyr", type = "Imports", min_version = pkg_version)
+
+pkg_version <- as.character(packageVersion("gggenes"))
+usethis::use_package("gggenes", type = "Imports", min_version = pkg_version)
+
+pkg_version <- as.character(packageVersion("ggplot2"))
+usethis::use_package("ggplot2", type = "Imports", min_version = pkg_version)
+
+
+# 内置数据集，依赖包的版本
+# 假设你的数据框叫 `module_abundance`
+blastp_df = '../test_gclink/blastp.Myxococcota.tsv' %>%
+  {read.csv(., sep = '\t',header = F,
+            col.names = c('qaccver', 'saccver', 'pident', 'length',
+                          'mismatch', 'gapopen', 'qstart', 'qend',
+                          'sstart', 'send', 'evalue', 'bitscore'),
+            quote='', check.names = F)}
+
+PGC_group = read.csv('../test_gclink/PGC_group.txt', sep = '\t', quote='', header = T, check.names = F)
+seq_data = "../test_gclink/CDS.Myxococcota.fna" %>%
+  {Biostrings::readBStringSet(., format="fasta", nrec=-1L, skip=0L, seek.first.rec=FALSE, use.names=TRUE)} %>%
+  {data.frame(Sequence = .)} %>%
+  {tibble::rownames_to_column(., "SeqName")}
+
+photosynthesis_gene_list = c('acsF','aerR','AL1','AL2','apcA',
+                             'apcB','apcC','apcD','apcE','apcF','apl',
+                             'bch2','bchB','bchC','bchD','bchE','bchF',
+                             'bchG','bchH','bchI','bchJ','bchK','bchL',
+                             'bchM','bchN','bchO','bchP','bchQ','bchR',
+                             'bchU','bchV','bchX','bchY','bchZ','bciA',
+                             'bciB','bciC','bciD','CAO','carT',
+                             'chlE','Chlorophyllase','cpcA','cpcB','cpcC',
+                             'cpcD','cpcE','cpcF','cpcG','cpeA','cpeB',
+                             'cpeC','cpeD','cpeE','cpeR','cpeS','cpeT',
+                             'cpeU','cpeY','cpeZ','crtA','crtB','crtC',
+                             'crtD','crtE','crtF','crtI','crtJ','crtL-b',
+                             'crtL-e','crtN','crtR','crtR-b','CRTS','crtU',
+                             'crtW','crtX','crtY','cruA','cruC','cruD',
+                             'cruF','cruO','cruP','DVR','HCAR','hemG',
+                             'hemY','lhaA','LUT1','LUT5','lyeJ','NOL',
+                             'PAO','PCD','pixG','pixH','pixI','pixJ',
+                             'pixL','por','ppaA','PPD','ppsR','psaA',
+                             'psaB','psaC','psaF','psaJ','psaL','psb28',
+                             'psbA','psbB','psbC','psbD','psbF','psbH',
+                             'psbO','psbV','pscA','pscA2','pscB','pscC',
+                             'pscD','pshA','pshB','pucA','pucB','pucC',
+                             'pufA','pufB','pufC','pufL','pufM','pufQ',
+                             'pufX','puhA','puhB','puhC','puhE','RCCR',
+                             'rfpA','rfpB','rfpC','SGR')
+out_dir = "data"
+
+if (!dir.exists(out_dir)) {
+  dir.create(out_dir, recursive = TRUE)
+}
+
+save(blastp_df, file = "data/blastp_df.rda", compress = "xz")
+save(PGC_group, file = "data/PGC_group.rda", compress = "xz")
+save(seq_data, file = "data/seq_data.rda", compress = "xz")
+save(photosynthesis_gene_list, file = "data/photosynthesis_gene_list.rda", compress = "xz")
+
+out_dir = "../test_gclink/scale_data"
+if (!dir.exists(out_dir)) {
+  dir.create(out_dir, recursive = TRUE)
+}
+blastp_df %>%
+  {write.table(., '../test_gclink/scale_data/blastp_df.tsv', row.names = FALSE,col.names = FALSE,
+               sep = '\t', quote = FALSE, fileEncoding="UTF-8")}
+PGC_group %>%
+  {write.table(., '../test_gclink/scale_data/PGC_group.tsv', row.names = FALSE,col.names = FALSE,
+               sep = '\t', quote = FALSE, fileEncoding="UTF-8")}
+seq_data %>%
+  {write.table(., '../test_gclink/scale_data/seq_data.tsv', row.names = FALSE,col.names = FALSE,
+               sep = '\t', quote = FALSE, fileEncoding="UTF-8")}
+photosynthesis_gene_list %>%
+  {write.table(., '../test_gclink/scale_data/photosynthesis_gene_list.tsv', row.names = FALSE,col.names = FALSE,
+               sep = '\t', quote = FALSE, fileEncoding="UTF-8")}
+
+usethis::use_data(blastp_df, overwrite = TRUE)
+usethis::use_data(PGC_group, overwrite = TRUE)
+usethis::use_data(seq_data, overwrite = TRUE)
+usethis::use_data(photosynthesis_gene_list, overwrite = TRUE)
+
+
+devtools::install()
+
+
+
+
+
+
+
+
+
+
+
