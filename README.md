@@ -127,7 +127,8 @@ ATGACGCCCTATCCCTTCACCGCCATCGTCGCGCAGGACGAGCTCAAGCTCGCCCTGCAGATCGCCACCGTCGACCGCAG
 ```
 
 #### 2.3 Gene cluster plot (`GC_plot`)
-![Uploading gc_plot.case1.png…]()
+<img width="6000" height="900" alt="gc_plot case1" src="https://github.com/user-attachments/assets/37a15149-d86a-4d5c-a2bd-b39b69deb863" />
+
 
 
 ## Case 2: Using eggnog result
