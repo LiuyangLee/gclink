@@ -1,4 +1,6 @@
-```markdown
+![GitHub Installs](https://img.shields.io/endpoint?url=https://r-pkg.github.io/install-stats/LiuyangLee/gclink/badge.json&label=GitHub%20Installs&style=flat-square)
+![CRAN Downloads](https://img.shields.io/badge/dynamic/json?url=https://cranlogs.r-pkg.org/badges/grand-total/gclink&query=$.count&label=CRAN%20Downloads&color=blue&style=flat-square)
+
 # gclink: Gene-Cluster Discovery, Annotation and Visualization
 
 ## Overview
@@ -61,6 +63,93 @@ plot(results$GC_plot)  # Visualization
   - Functional group levels
   - Genome subsets
 
+## Example for Input and Output Data
+### 1 Input Data Preview
+#### 1.1 A dataframe of Diamond BLASTp output (e.g., head(`blastp_df`))
+| qaccver                                                  | saccver                                                                 | pident | length | mismatch | gapopen | qstart | qend | sstart | send | evalue    | bitscore |
+|----------------------------------------------------------|-------------------------------------------------------------------------|--------|--------|----------|---------|--------|------|--------|------|-----------|----------|
+| Kuafubacteriaceae--GCA_016703535.1---JADJBV010000002.1_67 | enzymerhodopsin_XP_002954798.1_Volvox_carteri                          | 26.6   | 576    | 343      | 15      | 157    | 666  | 332    | 893  | 8.18e-41  | 161      |
+| Kuafubacteriaceae--GCA_016703535.1---JADJBV010000002.1_113 | petB_Candidatus_Methylomirabilis_oxyfera_DAMO_1671_MOX                 | 76.6   | 248    | 58       | 0       | 14     | 261  | 9      | 256  | 5.43e-149 | 417      |
+| Kuafubacteriaceae--GCA_016703535.1---JADJBV010000002.1_114 | petC_Candidatus_Nitronauta_litoralis_G3M70_16785_NLI                   | 50.8   | 177    | 73       | 2       | 8      | 184  | 27     | 189  | 3.83e-59  | 184      |
+| Kuafubacteriaceae--GCA_016703535.1---JADJBV010000002.1_523 | cruC_Humisphaera_borealis_IPV69_18620_HBS                             | 31.5   | 365    | 208      | 11      | 42     | 378  | 48     | 398  | 1.45e-41  | 151      |
+| Kuafubacteriaceae--GCA_016703535.1---JADJBV010000002.1_616 | rfpB_KL662192_1_938                                                   | 33.0   | 227    | 137      | 3       | 4      | 223  | 3      | 221  | 2.53e-32  | 124      |
+| Kuafubacteriaceae--GCA_016703535.1---JADJBV010000002.1_754 | bchI_p_Myxococcota--c_WYAZ01--o_WYAZ01--GCA_016703535.1---JADJBV010000002.1_754 | 100.0 | 343 | 0 | 0 | 1 | 343 | 1 | 343 | 4.73e-249 | 677 |
+
+#### 1.2 (Optional) A dataframe with SeqName (ORF identifier, Prodigal format: ⁠>ORF_id # start # end # strand # ...⁠) and Sequence (e.g., head(`seq_data`))
+| SeqName                                                                               | Sequence                                                                                                                                                                                                                                                 |
+|---------------------------------------------------------------------------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| Houyibacteriaceae--LLY-WYZ-15_3---k141_102864_1 # 3 # 266 # 1 # ID=85_1;partial=10;start_type=Edge;rbs_motif=None;rbs_spacer=None;gc_cont=0.807 | CCGGACGCGCCGCCCGCCCCGAAGGCCCCGCCGGCCGCCCCCACCTATCCGCTCGAAGGCGCGCTCGGTATCAGCCGCGTGCGCCTCGTGCGCGCCACGCCCTGCGGCCTCACCGGCCGCGAGCTCGGCGCCGGCGAGGAGGCCCTCCTCGTCCACTTCGACGACGGACGCCCGCCCCTCGCGGTCGCCCCCGACGCGCTCCCGACGCCCCCCGGCGACGGGACGCCCCCCACCGGCGCTCCGCCGGAAGGAGACCCCGCATGA |
+| Houyibacteriaceae--LLY-WYZ-15_3---k141_102864_2 # 263 # 490 # 1 # ID=85_2;partial=00;start_type=ATG;rbs_motif=AGGAG;rbs_spacer=5-10bp;gc_cont=0.737 | ATGACCCGCCCCGAAGACGCCCCGCCCACCCACGAAGCCGCGGACCGCGCCGTGCGCTCCCTCTTCCAGATCGGTCGCCTCTGGGCCTCCCACGGCCTCGAGATGGGTCGCATGACCTTGCGGACCGCCGCCAAGACCCTCGAGAGCACCGCCGAGACCCTCGAGGACCTCTCCCAGCGCGTCGCCCCCGACGACGAGCGCCCCGCGGACGAACGCGCCGCCGACTGA |
+| Houyibacteriaceae--LLY-WYZ-15_3---k141_102864_3 # 667 # 2184 # -1 # ID=85_3;partial=00;start_type=ATG;rbs_motif=AGGAGG;rbs_spacer=5-10bp;gc_cont=0.775 | ATGAGCGCGATCGAAGGGACCCGGCCTCGGGACGGCGAGGCCCGCATGCCCGTGGAGGCGACCCCCGTGGAGGCCATCGGGGGCCTCGTCGCCCGGGCGCGTGACGCCGGCTTCGACCACGCGGCCCGGCCCCTCGCCGAGCGCGCGGGGCTGCTGCGCGCGCTCGCGGACGCCATCCTCGCCGACGGGGAGGCCATCGTCGCGCTCCTCGAGGAGGAGACGGGCAAGCCGGCGGCGGAGGCGTGGCTCCACGAGGTCGTGCCGACGGCGGACCTCGGGAGCTGGTGGAGCAGCCAGGGGCCGGCGCACCTCGCGACGGAAGCCGTGCGCCTCGACCCGCTCGCCTACCCTGGCAAGCGCGCGCGCGTCGAGGTGGTCCCGCGTGGCGTCGTGGCGCTGATCACGCCTTGGAACTTCCCGGTGGCGATCCCGCTGCGGACGCTCTTCCCGGCGCTCCTCGCGGGCAACGGCGTCGTCTGGAAGCCGTCCGAGCACACGCCGCGGGTGGCGGCGCGCGTGCACGGGATCGTGCGCGAGGTCTTCGGGCCGGACCTGGTCGAGCTGGTGCAGGGCGCCGGCGCGCAGGGGGCGGCGCTGGTCGAGGCGGACGTGGACGCGGTGGTGTTCACGGGCAGCGTGGCGACCGGGCGGAAGGTCGGCGCGGCGGCGGGGCGGGCGCTCACGCCGGCGTCGCTCGAGCTCGGCGGCAAGGACGCGGCCGTGGTGCTCGACGACGCGGACCTGGAGCGCACGGCCCGGGGCCTGCTCTGGGCGGCGATGGCGAACGCGGGGCAGAACTGCGCCGGGCTCGAGCGCGTCTACGCGGTGGCGGAGGTCGCCGGCCCGCTGAAGGCGCGGCTCGGTGAGCTGGCCGGAGAGCTGGTGCCCGGGCGCGACGTGGGGCCGCTGGTGACCGAGGCGCAGCTCGCGACGGTGGAGCGGCACGTGCGCGAGGCGGTCGACGGGGGCGCGGAGGTGCTGGCCGGCGGCGAGCGGCTCGAGCGGGGCGGGCGCTGGTTCGCGCCGACCGTGCTGGCGGAGGTCGAGCCGTCTTCGGCGGCGCTCCGGGAGGAGACGTTCGGGCCGGTGGTCGTCGTGCAGACGGTGGCGGACGAGGCGGCGGCCGTGGCGGCGGCGAACGACTCGCGCTTCGGGCTGACGGCGAGCGTCTGGACGCGGGACGCGGCGCGCGGGGAGGCGGTCGCACGGCGGCTCCGGGCGGGCGTCGTGACGGTGAACAACCACGCCTTCACCGGGGCCATCCCGGCGCTGCCCTGGGGCGGCGTCGGCGAGACGGGCTTCGGGGTGACGAACTCGCCGCACGCGCTCCACGCATTGGTGCGGCCGCGGGCCGTGGTCGTGGACGGCAACGCGCGGCCGGAGCTCTACTGGCACCCCTACGACGAGGCGCTCGAGCGGCTCGGGAAGGGCATGGCGGCGCTCCGCGGCAAGGGCGGGCCGATCACGAAGGTGCGCGCCGTGGCCAGGCTGCTCGGGGCGCTCCGCCGGCGCTTCTGA |
+
+#### 1.3 (Optional) Gene group (e.g., head(`PGC_group`))
+| gene     | gene_group | gene_label |
+|----------|------------|------------|
+| bciE     | bci        | E          |
+| bchB     | bch        | B          |
+| bchC     | bch        | C          |
+| bchD     | bch        | D          |
+
+#### 1.4 (Optional) Candidate gene list (e.g., head(`photosynthesis_gene_list`))
+bciE
+bchB
+bchC
+bchD
+bchE
+
+### 2 Output Data Preview
+#### 2.1 Gene cluster information (`GC_meta`)
+> head(gc_meta)
+    gene                                           qaccver                                                                              saccver
+54 pufC  Houyibacteriaceae--LLY-WYZ-15_3---k141_102864_97                                            pufC_Rhodospirillum_centenum_RC1_2101_RCE
+58 pufM  Houyibacteriaceae--LLY-WYZ-15_3---k141_102864_98   pufM_p_Myxococcota--c_Polyangia--o_Polyangiales--ERR1726576_bin.13---k141_102738_3
+57 pufL  Houyibacteriaceae--LLY-WYZ-15_3---k141_102864_99   pufL_p_Myxococcota--c_Polyangia--o_Polyangiales--ERR1726567_bin.15---k141_184359_2
+28 bchO Houyibacteriaceae--LLY-WYZ-15_3---k141_102864_100                               bchO_Pararhodospirillum_photometricum_RSPPHO_00117_RPM
+12 bchD Houyibacteriaceae--LLY-WYZ-15_3---k141_102864_101 bchD_p_Myxococcota--c_Polyangia--o_Polyangiales--GCA_002699025.1---PABA01000098.1_81
+20 bchI Houyibacteriaceae--LLY-WYZ-15_3---k141_102864_102 bchI_p_Myxococcota--c_Polyangia--o_Polyangiales--GCA_002699025.1---PABA01000098.1_82
+
+    pident length mismatch gapopen qstart qend sstart send    evalue bitscore                          genome             orf      contig
+54   53.1    335      147       7      3  329      6  338 7.66e-112      333 Houyibacteriaceae--LLY-WYZ-15_3  k141_102864_97 k141_102864
+58  100.0    437        0       0      1  437      1  437 4.73e-308      834 Houyibacteriaceae--LLY-WYZ-15_3  k141_102864_98 k141_102864
+57  100.0    275        0       0      1  275      1  275 2.63e-214      583 Houyibacteriaceae--LLY-WYZ-15_3  k141_102864_99 k141_102864
+28   44.9    265      144       1     33  295     28  292  6.97e-60      194 Houyibacteriaceae--LLY-WYZ-15_3 k141_102864_100 k141_102864
+12  100.0    587        0       0      1  587      1  587  0.00e+00     1064 Houyibacteriaceae--LLY-WYZ-15_3 k141_102864_101 k141_102864
+20  100.0    339        0       0      1  339      1  339 1.97e-239      652 Houyibacteriaceae--LLY-WYZ-15_3 k141_102864_102 k141_102864
+
+                                    genome_contig orf_position                                      gene_cluster GC_orf_position GC_present_length
+54 Houyibacteriaceae--LLY-WYZ-15_3---k141_102864           97 Houyibacteriaceae--LLY-WYZ-15_3---k141_102864---1               1                34
+58 Houyibacteriaceae--LLY-WYZ-15_3---k141_102864           98 Houyibacteriaceae--LLY-WYZ-15_3---k141_102864---1               2                34
+57 Houyibacteriaceae--LLY-WYZ-15_3---k141_102864           99 Houyibacteriaceae--LLY-WYZ-15_3---k141_102864---1               3                34
+28 Houyibacteriaceae--LLY-WYZ-15_3---k141_102864          100 Houyibacteriaceae--LLY-WYZ-15_3---k141_102864---1               4                34
+12 Houyibacteriaceae--LLY-WYZ-15_3---k141_102864          101 Houyibacteriaceae--LLY-WYZ-15_3---k141_102864---1               5                34
+20 Houyibacteriaceae--LLY-WYZ-15_3---k141_102864          102 Houyibacteriaceae--LLY-WYZ-15_3---k141_102864---1               6                34
+
+   GC_absent_length GC_length
+54                2        36
+58                2        36
+57                2        36
+28                2        36
+12                2        36
+20                2        36
+
+                                                                                                                                                                 SeqName
+54     Houyibacteriaceae--LLY-WYZ-15_3---k141_102864_97 # 117640 # 118917 # -1 # ID=85_97;partial=00;start_type=GTG;rbs_motif=GGAG/GAGG;rbs_spacer=5-10bp;gc_cont=0.710
+58     Houyibacteriaceae--LLY-WYZ-15_3---k141_102864_98 # 118914 # 120224 # -1 # ID=85_98;partial=00;start_type=ATG;rbs_motif=GGAG/GAGG;rbs_spacer=5-10bp;gc_cont=0.704
+57     Houyibacteriaceae--LLY-WYZ-15_3---k141_102864_99 # 120270 # 121094 # -1 # ID=85_99;partial=00;start_type=ATG;rbs_motif=GGAG/GAGG;rbs_spacer=5-10bp;gc_cont=0.648
+28   Houyibacteriaceae--LLY-WYZ-15_3---k141_102864_100 # 121191 # 122102 # -1 # ID=85_100;partial=00;start_type=ATG;rbs_motif=GGAG/GAGG;rbs_spacer=5-10bp;gc_cont=0.762
+12          Houyibacteriaceae--LLY-WYZ-15_3---k141_102864_101 # 122099 # 123859 # -1 # ID=85_101;partial=00;start_type=ATG;rbs_motif=None;rbs_spacer=None;gc_cont=0.792
+20 Houyibacteriaceae--LLY-WYZ-15_3---k141_102864_102 # 123863 # 124879 # -1 # ID=85_102;partial=00;start_type=ATG;rbs_motif=GGA/GAG/AGG;rbs_spacer=5-10bp;gc_cont=0.745
+
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             Sequence
+54                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    GTGAAGAAGATCGCCATCGCCTTCGTGAGCACCTGGCTCCTCATCGGGGCCGTCTACGC......
+58                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   ATGGCCCGCTACCAGAACATCTTCACGCAGATCCAAGTCGTCGGTCCGCCGGACACGCC......
+
+#### 2.2 Gene cluster sequence (`GC_seq`)
+
+
+#### 2.3 Gene cluster plot (`GC_plot`)
+
+
 ## Documentation
 
 Full function reference:
@@ -92,4 +181,3 @@ GPL-3 © [Liuyang Li](https://orcid.org/0000-0001-6004-9437)
 
 - Maintainer: Liuyang Li <cyanobacteria@yeah.net>
 - Bug reports: https://github.com/LiuyangLee/gclink/issues
-```
