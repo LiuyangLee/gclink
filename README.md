@@ -23,24 +23,76 @@ devtools::install_github("LiuyangLee/gclink")
 
 ```r
 library(gclink)
-
-# Full pipeline example
+# Case 1: Using blastp result with Full pipeline (Find Cluster + Extract FASTA + Plot Cluster)
 data(blastp_df)
 data(seq_data)
 data(photosynthesis_gene_list)
 data(PGC_group)
+gc_list <- gclink(in_blastp_df = blastp_df,
+                  in_seq_data = seq_data,
+                  in_gene_list = photosynthesis_gene_list,
+                  in_GC_group  = PGC_group,
+                  AllGeneNum = 50,
+                  MinConSeq  = 25,
+                  apply_length_filter = TRUE,
+                  down_IQR   = 10,
+                  up_IQR     = 10,
+                  orf_before_first = 0,
+                  orf_after_last = 0,
+                  levels_gene_group = c('bch','puh','puf','crt','acsF','assembly','regulator',
+                                        'hypothetical ORF'),
+                  color_theme = c('#3BAA51','#6495ED','#DD2421','#EF9320','#F8EB00',
+                                  '#FF0683','#956548','grey'),
+                  genome_subset = NULL)
+gc_meta = gc_list[["GC_meta"]]
+gc_seq = gc_list[["GC_seq"]]
+gc_plot = gc_list[["GC_plot"]]
+head(gc_meta)   # Cluster metadata
+head(gc_seq)    # FASTA sequences
+print(gc_plot)  # Visualization
+```
 
-results <- gclink(
-  in_blastp_df = blastp_df,
-  in_seq_data = seq_data,
-  in_gene_list = photosynthesis_gene_list,
-  in_GC_group = PGC_group
-)
-
-# Access results
-head(results$GC_meta)  # Cluster metadata
-head(results$GC_seq)   # FASTA sequences
-plot(results$GC_plot)  # Visualization
+```r
+# Case 2: Using eggnog result with Full pipeline (Find Cluster + Extract FASTA + Plot Cluster)
+data(eggnog_df)
+data(seq_data)
+data(KO_group)
+KOs = c("K02291","K09844","K20611","K13789",
+        "K09846","K08926","K08927","K08928",
+        "K08929","K13991","K04035","K04039",
+        "K11337","K03404","K11336","K04040",
+        "K03403","K03405","K04037","K03428",
+        "K04038","K06049","K10960","K11333",
+        "K11334","K11335","K08226","K08226",
+        "K09773")
+rename_KOs = paste0("ko:", KOs)
+eggnog_df$qaccver = eggnog_df$`#query`
+eggnog_df$saccver = eggnog_df$KEGG_ko
+eggnog_df$evalue = eggnog_df$evalue
+eggnog_df$bitscore = eggnog_df$score
+eggnog_df$gene = eggnog_df$KEGG_ko
+gc_list_2 = gclink(in_blastp_df = eggnog_df,
+                  in_seq_data = seq_data,
+                  in_gene_list = rename_KOs,
+                  in_GC_group  = KO_group,
+                  AllGeneNum = 50,
+                  MinConSeq  = 25,
+                  apply_evalue_filter = F,
+                  min_evalue = 1,
+                  apply_score_filter = T,
+                  min_score = 10,
+                  orf_before_first = 1,
+                  orf_after_last = 1,
+                  levels_gene_group = c('bch','puh','puf','crt',
+                                        'acsF','assembly','hypothetical ORF'),
+                  color_theme = c('#3BAA51','#6495ED','#DD2421','#EF9320',
+                                  '#F8EB00','#FF0683','grey'))
+gc_meta_2 = gc_list_2[["GC_meta"]]
+gc_seq_2 = gc_list_2[["GC_seq"]]
+gc_plot_2 = gc_list_2[["GC_plot"]]
+head(gc_meta_2)   # Cluster metadata
+head(gc_seq_2)    # FASTA sequences
+print(gc_plot_2)  # Visualization
 ```
 
 ## Key Features
@@ -61,9 +113,20 @@ plot(results$GC_plot)  # Visualization
   - Functional group levels
   - Genome subsets
 
-## Example for Input and Output Data
+## Case 1: Using blastp result
 ### 1 Input Data Preview
 #### 1.1 A dataframe of Diamond BLASTp output (e.g., head(`blastp_df`))
+A data.frame of Diamond BLASTp output with columns:
+qaccver: Genome + contig name (separated by "---"), e.g., "Kuafubacteriaceae--GCA_016703535.1---JADJBV010000001.1_150":
+Genome: "Kuafubacteriaceae--GCA_016703535.1" ("--" separator),
+Contig: "JADJBV010000001.1",
+ORF: "JADJBV010000001.1_150" ("_" separator),
+Position: "150".
+saccver: Gene name + metadata ("_" separator), e.g., "bchC_Methyloversatilis_sp_RAC08_BSY238_2447_METR":
+Gene: "bchC",
+Metadata(Optional): "Methyloversatilis_sp_RAC08_BSY238_2447_METR".
+EggNOG results are supported by renaming annotation columns (e.g., "GOs") to saccver. Default: blastp_df.
+
 | qaccver                                                  | saccver                                                                 | pident | length | mismatch | gapopen | qstart | qend | sstart | send | evalue    | bitscore |
 |----------------------------------------------------------|-------------------------------------------------------------------------|--------|--------|----------|---------|--------|------|--------|------|-----------|----------|
 | Kuafubacteriaceae--GCA_016703535.1---JADJBV010000002.1_67 | enzymerhodopsin_XP_002954798.1_Volvox_carteri                          | 26.6   | 576    | 343      | 15      | 157    | 666  | 332    | 893  | 8.18e-41  | 161      |
@@ -119,7 +182,44 @@ ATGACGCCCTATCCCTTCACCGCCATCGTCGCGCAGGACGAGCTCAAGCTCGCCCTGCAGATCGCCACCGTCGACCGCAG
 ```
 
 #### 2.3 Gene cluster plot (`GC_plot`)
-<img width="6000" height="900" alt="gc_plot test" src="https://github.com/user-attachments/assets/be54848f-1d0f-4c45-9e79-73a6beb1b4cf" />
+<img width="6000" height="900" alt="gc_plot case1" src="https://github.com/user-attachments/assets/c2a9c967-642f-4c08-8a7f-fe92c56d6fdc" />
+
+
+## Case 2: Using eggnog result
+### 1 Input Data Preview
+#### 1.1 A dataframe of Diamond BLASTp output from eggnog (e.g., head(`eggnog_df`))
+| #query | seed_ortholog | evalue | score | eggNOG_OGs | max_annot_lvl | COG_category | Description | Preferred_name | GOs | EC | KEGG_ko | KEGG_Pathway | KEGG_Module | KEGG_Reaction | KEGG_rclass | BRITE | KEGG_TC | CAZy | BiGG_Reaction | PFAMs |
+|--------|--------------|--------|-------|------------|---------------|--------------|-------------|---------------|-----|----|---------|--------------|-------------|---------------|-------------|-------|---------|------|---------------|-------|
+| Kuafuiibacteriaceae--GCA_016703535.1---JADJBV010000001.1_1 | 439375.Oant_2732 | 1.57E-45 | 162 | COG3293@1\|root,COG3293@2\|Bacteria,1PVIT@1224\|Proteobacteria,2TURP@28211\|Alphaproteobacteria,1J3RT@118882\|Brucellaceae | 28211\|Alphaproteobacteria | L | Transposase DDE domain | - | - | - | ko:K07492 | - | - | - | - | ko00000 | - | - | - | DDE_Tnp_1,DDE_Tnp_1_2,DUF4096 |
+| Kuafuiibacteriaceae--GCA_016703535.1---JADJBV010000001.1_2 | 1173264.KI913949_gene2450 | 3.58E-17 | 83.6 | COG3335@1\|root,COG3415@1\|root,COG3335@2\|Bacteria,COG3415@2\|Bacteria,1G39S@1117\|Cyanobacteria,1HCKE@1150\|Oscillatoriales | 1117\|Cyanobacteria | L | COGs COG3415 Transposase and inactivated derivatives | - | - | - | ko:K07494 | - | - | - | - | ko00000 | - | - | - | DDE_3,HTH_32,HTH_Tnp_IS630 |
+| Kuafuiibacteriaceae--GCA_016703535.1---JADJBV010000001.1_3 | 794903.OPIT5_03400 | 3.03E-30 | 114 | COG3335@1\|root,COG3335@2\|Bacteria | 2\|Bacteria | L | DDE superfamily endonuclease | - | - | - | ko:K07494 | - | - | - | - | ko00000 | - | - | - | DDE_3,HTH_Tnp_IS630 |
+| Kuafuiibacteriaceae--GCA_016703535.1---JADJBV010000001.1_5 | 502025.Hoch_2790 | 2.78E-50 | 191 | 2AY84@1\|root,31QA9@2\|Bacteria,1QMYF@1224\|Proteobacteria,4374U@68525\|delta/epsilon subdivisions,2X20E@28221\|Deltaproteobacteria,2YWTZ@29\|Myxococcales | 28221\|Deltaproteobacteria | - | - | - | - | - | - | - | - | - | - | - | - | - | - | - |
+| Kuafuiibacteriaceae--GCA_016703535.1---JADJBV010000001.1_11 | 105420.BBPO01000003_gene1121 | 2.00E-11 | 72.8 | COG2887@1\|root,COG2887@2\|Bacteria,2GJC5@201174\|Actinobacteria,2NGJC@228398\|Streptacidiphilus | 201174\|Actinobacteria | L | Protein of unknown function (DUF2800) | recB | - | - | ko:K07465 | - | - | - | - | ko00000 | - | - | - | PDDEXK_1 |
+| Kuafuiibacteriaceae--GCA_016703535.1---JADJBV010000001.1_12 | 1122915.AUGY01000071_gene4398 | 2.13E-37 | 152 | COG1201@1\|root,COG1201@2\|Bacteria,1UHYQ@1239\|Firmicutes,4ISB0@91061\|Bacilli,277Q5@186822\|Paenibacillaceae | 91061\|Bacilli | L | helicase superfamily c-terminal domain | - | - | - | - | - | - | - | - | - | - | - | - | DUF1998,Helicase_C |
+
+#### 1.2 (Optional) A dataframe with SeqName (ORF identifier, Prodigal format: ⁠ORF_id # start # end # strand # ...⁠) and Sequence (e.g., head(`seq_data`))
+Same with Case 1
+
+#### 1.3 (Optional) KO/gene group (e.g., head(`KO_group`))
+| gene       | gene_group | gene_label |
+|------------|------------|------------|
+| ko:K04035  | acsF       | acsF       |
+| ko:K08226  | assembly   | bch2       |
+| ko:K04039  | bch        | B          |
+| ko:K11337  | bch        | C          |
+| ko:K03404  | bch        | D          |
+| ko:K11336  | bch        | F          |
+
+#### 1.4 (Optional) Candidate KO/gene list
+ko:K04035 ko:K08226 ko:K04039 ko:K11337 ko:K03404 ko:K11336
+
+### 2 Output Data Preview
+#### 2.1 Gene cluster information (`GC_meta`)
+Similar with Case 1
+#### 2.2 Gene cluster sequence (`GC_seq`)
+Similar with Case 1
+#### 2.3 Gene cluster plot (`GC_plot`)
+<img width="6000" height="900" alt="gc_plot case2" src="https://github.com/user-attachments/assets/bbf8db43-76e5-4d61-8d71-ac9100ee8acd" />
 
 
 ## Documentation
