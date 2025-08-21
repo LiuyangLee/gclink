@@ -11,6 +11,25 @@
 - Contiguous cluster detection
 - Publication-ready visualization
 
+
+## Key Features
+
+### Adaptive Workflow
+- Works with or without CDS FASTA input
+- Skips plotting when functional grouping is absent
+- Supports custom gene lists for universal cluster detection
+
+### Cluster Detection
+- Density-based identification via `AllGeneNum` and `MinConSeq` parameters
+- Handles incomplete gene annotation coverage
+- Optional insertion of hypothetical ORFs at cluster boundaries
+
+### Visualization
+- Publication-ready arrow plots with customizable based on `gggenes`:
+  - Color themes
+  - Functional group levels
+  - Genome subsets
+
 ## Installation
 
 ```r
@@ -19,11 +38,10 @@ if (!require("devtools")) install.packages("devtools")
 devtools::install_github("LiuyangLee/gclink")
 ```
 
-## Quick Start
-
+## Case 1: Using blastp result
 ```r
-library(gclink)
 # Case 1: Using blastp result with Full pipeline (Find Cluster + Extract FASTA + Plot Cluster)
+library(gclink)
 data(blastp_df)
 data(seq_data)
 data(photosynthesis_gene_list)
@@ -52,81 +70,8 @@ head(gc_seq)    # FASTA sequences
 print(gc_plot)  # Visualization
 ```
 
-```r
-# Case 2: Using eggnog result with Full pipeline (Find Cluster + Extract FASTA + Plot Cluster)
-data(eggnog_df)
-data(seq_data)
-data(KO_group)
-KOs = c("K02291","K09844","K20611","K13789",
-        "K09846","K08926","K08927","K08928",
-        "K08929","K13991","K04035","K04039",
-        "K11337","K03404","K11336","K04040",
-        "K03403","K03405","K04037","K03428",
-        "K04038","K06049","K10960","K11333",
-        "K11334","K11335","K08226","K08226",
-        "K09773")
-rename_KOs = paste0("ko:", KOs)
-eggnog_df$qaccver = eggnog_df$`#query`
-eggnog_df$saccver = eggnog_df$KEGG_ko
-eggnog_df$evalue = eggnog_df$evalue
-eggnog_df$bitscore = eggnog_df$score
-eggnog_df$gene = eggnog_df$KEGG_ko
-gc_list_2 = gclink(in_blastp_df = eggnog_df,
-                  in_seq_data = seq_data,
-                  in_gene_list = rename_KOs,
-                  in_GC_group  = KO_group,
-                  AllGeneNum = 50,
-                  MinConSeq  = 25,
-                  apply_evalue_filter = F,
-                  min_evalue = 1,
-                  apply_score_filter = T,
-                  min_score = 10,
-                  orf_before_first = 1,
-                  orf_after_last = 1,
-                  levels_gene_group = c('bch','puh','puf','crt',
-                                        'acsF','assembly','hypothetical ORF'),
-                  color_theme = c('#3BAA51','#6495ED','#DD2421','#EF9320',
-                                  '#F8EB00','#FF0683','grey'))
-gc_meta_2 = gc_list_2[["GC_meta"]]
-gc_seq_2 = gc_list_2[["GC_seq"]]
-gc_plot_2 = gc_list_2[["GC_plot"]]
-head(gc_meta_2)   # Cluster metadata
-head(gc_seq_2)    # FASTA sequences
-print(gc_plot_2)  # Visualization
-```
-
-## Key Features
-
-### Adaptive Workflow
-- Works with or without CDS FASTA input
-- Skips plotting when functional grouping is absent
-- Supports custom gene lists for universal cluster detection
-
-### Cluster Detection
-- Density-based identification via `AllGeneNum` and `MinConSeq` parameters
-- Handles incomplete gene annotation coverage
-- Optional insertion of hypothetical ORFs at cluster boundaries
-
-### Visualization
-- Publication-ready arrow plots with customizable based on `gggenes`:
-  - Color themes
-  - Functional group levels
-  - Genome subsets
-
-## Case 1: Using blastp result
 ### 1 Input Data Preview
 #### 1.1 A dataframe of Diamond BLASTp output (e.g., head(`blastp_df`))
-A data.frame of Diamond BLASTp output with columns:
-qaccver: Genome + contig name (separated by "---"), e.g., "Kuafubacteriaceae--GCA_016703535.1---JADJBV010000001.1_150":
-Genome: "Kuafubacteriaceae--GCA_016703535.1" ("--" separator),
-Contig: "JADJBV010000001.1",
-ORF: "JADJBV010000001.1_150" ("_" separator),
-Position: "150".
-saccver: Gene name + metadata ("_" separator), e.g., "bchC_Methyloversatilis_sp_RAC08_BSY238_2447_METR":
-Gene: "bchC",
-Metadata(Optional): "Methyloversatilis_sp_RAC08_BSY238_2447_METR".
-EggNOG results are supported by renaming annotation columns (e.g., "GOs") to saccver. Default: blastp_df.
-
 | qaccver                                                  | saccver                                                                 | pident | length | mismatch | gapopen | qstart | qend | sstart | send | evalue    | bitscore |
 |----------------------------------------------------------|-------------------------------------------------------------------------|--------|--------|----------|---------|--------|------|--------|------|-----------|----------|
 | Kuafubacteriaceae--GCA_016703535.1---JADJBV010000002.1_67 | enzymerhodopsin_XP_002954798.1_Volvox_carteri                          | 26.6   | 576    | 343      | 15      | 157    | 666  | 332    | 893  | 8.18e-41  | 161      |
@@ -182,10 +127,54 @@ ATGACGCCCTATCCCTTCACCGCCATCGTCGCGCAGGACGAGCTCAAGCTCGCCCTGCAGATCGCCACCGTCGACCGCAG
 ```
 
 #### 2.3 Gene cluster plot (`GC_plot`)
-<img width="6000" height="900" alt="gc_plot case1" src="https://github.com/user-attachments/assets/c2a9c967-642f-4c08-8a7f-fe92c56d6fdc" />
+![Uploading gc_plot.case1.png…]()
 
 
 ## Case 2: Using eggnog result
+```r
+# Case 2: Using eggnog result with Full pipeline (Find Cluster + Extract FASTA + Plot Cluster)
+library(gclink)
+data(eggnog_df)
+data(seq_data)
+data(KO_group)
+KOs = c("K02291","K09844","K20611","K13789",
+        "K09846","K08926","K08927","K08928",
+        "K08929","K13991","K04035","K04039",
+        "K11337","K03404","K11336","K04040",
+        "K03403","K03405","K04037","K03428",
+        "K04038","K06049","K10960","K11333",
+        "K11334","K11335","K08226","K08226",
+        "K09773")
+rename_KOs = paste0("ko:", KOs)
+eggnog_df$qaccver = eggnog_df$`#query`
+eggnog_df$saccver = eggnog_df$KEGG_ko
+eggnog_df$evalue = eggnog_df$evalue
+eggnog_df$bitscore = eggnog_df$score
+eggnog_df$gene = eggnog_df$KEGG_ko
+gc_list_2 = gclink(in_blastp_df = eggnog_df,
+                  in_seq_data = seq_data,
+                  in_gene_list = rename_KOs,
+                  in_GC_group  = KO_group,
+                  AllGeneNum = 50,
+                  MinConSeq  = 25,
+                  apply_evalue_filter = F,
+                  min_evalue = 1,
+                  apply_score_filter = T,
+                  min_score = 10,
+                  orf_before_first = 1,
+                  orf_after_last = 1,
+                  levels_gene_group = c('bch','puh','puf','crt',
+                                        'acsF','assembly','hypothetical ORF'),
+                  color_theme = c('#3BAA51','#6495ED','#DD2421','#EF9320',
+                                  '#F8EB00','#FF0683','grey'))
+gc_meta_2 = gc_list_2[["GC_meta"]]
+gc_seq_2 = gc_list_2[["GC_seq"]]
+gc_plot_2 = gc_list_2[["GC_plot"]]
+head(gc_meta_2)   # Cluster metadata
+head(gc_seq_2)    # FASTA sequences
+print(gc_plot_2)  # Visualization
+```
+
 ### 1 Input Data Preview
 #### 1.1 A dataframe of Diamond BLASTp output from eggnog (e.g., head(`eggnog_df`))
 | #query | seed_ortholog | evalue | score | eggNOG_OGs | max_annot_lvl | COG_category | Description | Preferred_name | GOs | EC | KEGG_ko | KEGG_Pathway | KEGG_Module | KEGG_Reaction | KEGG_rclass | BRITE | KEGG_TC | CAZy | BiGG_Reaction | PFAMs |
@@ -219,7 +208,7 @@ Similar with Case 1
 #### 2.2 Gene cluster sequence (`GC_seq`)
 Similar with Case 1
 #### 2.3 Gene cluster plot (`GC_plot`)
-<img width="6000" height="900" alt="gc_plot case2" src="https://github.com/user-attachments/assets/bbf8db43-76e5-4d61-8d71-ac9100ee8acd" />
+<img width="6000" height="900" alt="gc_plot case2" src="https://github.com/user-attachments/assets/19982c2f-b235-41d9-8d49-03fde3e4ba2c" />
 
 
 ## Documentation
